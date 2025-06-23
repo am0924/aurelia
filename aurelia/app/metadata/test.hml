@@ -1,0 +1,52 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: test
+  fields:
+    - name: message
+      type: String!
+    - name: success
+      type: Boolean!
+  graphql:
+    typeName: test
+    inputTypeName: test_input
+  dataConnectorTypeMapping:
+    - dataConnectorName: utils
+      dataConnectorObjectType: test
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: test
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - message
+          - success
+
+---
+kind: Command
+version: v1
+definition:
+  name: test
+  outputType: test!
+  source:
+    dataConnectorName: utils
+    dataConnectorCommand:
+      function: test
+  graphql:
+    rootFieldName: test
+    rootFieldKind: Query
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: test
+  permissions:
+    - role: admin
+      allowExecution: true
+

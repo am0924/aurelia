@@ -1,0 +1,35 @@
+kind: Subgraph
+version: v2
+definition:
+  name: app
+  generator:
+    rootPath: .
+    namingConvention: none
+  includePaths:
+    - metadata
+  envMapping:
+    APP_MONGODB_AUTHORIZATION_HEADER:
+      fromEnv: APP_MONGODB_AUTHORIZATION_HEADER
+    APP_MONGODB_READ_URL:
+      fromEnv: APP_MONGODB_READ_URL
+    APP_MONGODB_WRITE_URL:
+      fromEnv: APP_MONGODB_WRITE_URL
+    APP_POSTGRES_AUTHORIZATION_HEADER:
+      fromEnv: APP_POSTGRES_AUTHORIZATION_HEADER
+    APP_POSTGRES_READ_URL:
+      fromEnv: APP_POSTGRES_READ_URL
+    APP_POSTGRES_WRITE_URL:
+      fromEnv: APP_POSTGRES_WRITE_URL
+    APP_UTILS_AUTHORIZATION_HEADER:
+      fromEnv: APP_UTILS_AUTHORIZATION_HEADER
+    APP_UTILS_READ_URL:
+      fromEnv: APP_UTILS_READ_URL
+    APP_UTILS_WRITE_URL:
+      fromEnv: APP_UTILS_WRITE_URL
+  connectors:
+    - path: connector/postgres/connector.yaml
+      connectorLinkName: postgres
+    - path: connector/mongodb/connector.yaml
+      connectorLinkName: mongodb
+    - path: connector/utils/connector.yaml
+      connectorLinkName: utils

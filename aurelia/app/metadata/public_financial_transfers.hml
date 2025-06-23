@@ -1,0 +1,319 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: public_financial_transfers
+  description: Captures transaction activity between customer accounts, including payment channels, cross-border movement, and typology indicators.
+  fields:
+    - name: amount
+      type: bigdecimal
+      description: Amount transferred.
+    - name: date
+      type: date
+      description: Date of the transaction.
+    - name: is_laundering
+      type: boolean
+      description: Boolean flag indicating whether the transaction was identified as laundering.
+    - name: laundering_type
+      type: string
+      description: |
+        Laundering typology classification confirmed by compliance.
+        Possible values: 'cross_border', 'darknet', 'structuring', 'none'.
+        Use this field to analyze which laundering strategies are most prevalent among actual transactions.
+    - name: payment_currency
+      type: string
+      description: Currency used by the sender (e.g., USD, GBP).
+    - name: payment_type
+      type: string
+      description: Method of payment (e.g., wire, check, ACH).
+    - name: received_currency
+      type: string
+      description: Currency received by the receiver (e.g., USD, GBP).
+    - name: receiver_account
+      type: int32
+      description: Bank account number of the receiver. References public_customers.account.
+    - name: receiver_bank_location
+      type: string
+      description: Country of the receiving bank branch (e.g., Canada, USA, UK, Germany).
+    - name: sender_account
+      type: int32
+      description: Bank account number of the sender. References public_customers.account.
+    - name: sender_bank_location
+      type: string
+      description: Country of the sending bank branch (e.g., Canada, USA, UK, Germany).
+    - name: time
+      type: string
+      description: Local time the transaction occurred (hh:mm format).
+    - name: transaction_id
+      type: int32!
+      description: Unique transaction identifier.
+  graphql:
+    typeName: public_financial_transfers
+    inputTypeName: public_financial_transfers_input
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: public.financial_transfers
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: public_financial_transfers
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - amount
+          - date
+          - is_laundering
+          - laundering_type
+          - payment_currency
+          - payment_type
+          - received_currency
+          - receiver_account
+          - receiver_bank_location
+          - sender_account
+          - sender_bank_location
+          - time
+          - transaction_id
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: public_financial_transfers_bool_exp
+  operand:
+    object:
+      type: public_financial_transfers
+      comparableFields:
+        - fieldName: amount
+          booleanExpressionType: numeric_bool_exp
+        - fieldName: date
+          booleanExpressionType: date_bool_exp
+        - fieldName: is_laundering
+          booleanExpressionType: boolean_bool_exp
+        - fieldName: laundering_type
+          booleanExpressionType: character_varying_bool_exp
+        - fieldName: payment_currency
+          booleanExpressionType: character_varying_bool_exp
+        - fieldName: payment_type
+          booleanExpressionType: character_varying_bool_exp
+        - fieldName: received_currency
+          booleanExpressionType: character_varying_bool_exp
+        - fieldName: receiver_account
+          booleanExpressionType: integer_bool_exp
+        - fieldName: receiver_bank_location
+          booleanExpressionType: character_varying_bool_exp
+        - fieldName: sender_account
+          booleanExpressionType: integer_bool_exp
+        - fieldName: sender_bank_location
+          booleanExpressionType: character_varying_bool_exp
+        - fieldName: time
+          booleanExpressionType: character_varying_bool_exp
+        - fieldName: transaction_id
+          booleanExpressionType: integer_bool_exp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: public_financial_transfers_bool_exp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: public_financial_transfers_agg_exp
+  operand:
+    object:
+      aggregatedType: public_financial_transfers
+      aggregatableFields:
+        - fieldName: amount
+          aggregateExpression: numeric_agg_exp
+        - fieldName: date
+          aggregateExpression: date_agg_exp
+        - fieldName: is_laundering
+          aggregateExpression: boolean_agg_exp
+        - fieldName: laundering_type
+          aggregateExpression: character_varying_agg_exp
+        - fieldName: payment_currency
+          aggregateExpression: character_varying_agg_exp
+        - fieldName: payment_type
+          aggregateExpression: character_varying_agg_exp
+        - fieldName: received_currency
+          aggregateExpression: character_varying_agg_exp
+        - fieldName: receiver_account
+          aggregateExpression: integer_agg_exp
+        - fieldName: receiver_bank_location
+          aggregateExpression: character_varying_agg_exp
+        - fieldName: sender_account
+          aggregateExpression: integer_agg_exp
+        - fieldName: sender_bank_location
+          aggregateExpression: character_varying_agg_exp
+        - fieldName: time
+          aggregateExpression: character_varying_agg_exp
+        - fieldName: transaction_id
+          aggregateExpression: integer_agg_exp
+  count:
+    enable: true
+  graphql:
+    selectTypeName: public_financial_transfers_agg_exp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: public_financial_transfers_order_by_exp
+  operand:
+    object:
+      orderedType: public_financial_transfers
+      orderableFields:
+        - fieldName: amount
+          orderByExpression: bigdecimal_order_by_exp
+        - fieldName: date
+          orderByExpression: date_order_by_exp
+        - fieldName: is_laundering
+          orderByExpression: boolean_order_by_exp
+        - fieldName: laundering_type
+          orderByExpression: string_order_by_exp
+        - fieldName: payment_currency
+          orderByExpression: string_order_by_exp
+        - fieldName: payment_type
+          orderByExpression: string_order_by_exp
+        - fieldName: received_currency
+          orderByExpression: string_order_by_exp
+        - fieldName: receiver_account
+          orderByExpression: int32_order_by_exp
+        - fieldName: receiver_bank_location
+          orderByExpression: string_order_by_exp
+        - fieldName: sender_account
+          orderByExpression: int32_order_by_exp
+        - fieldName: sender_bank_location
+          orderByExpression: string_order_by_exp
+        - fieldName: time
+          orderByExpression: string_order_by_exp
+        - fieldName: transaction_id
+          orderByExpression: int32_order_by_exp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: public_financial_transfers_order_by_exp
+
+---
+kind: Model
+version: v2
+definition:
+  name: public_financial_transfers
+  objectType: public_financial_transfers
+  source:
+    dataConnectorName: postgres
+    collection: public.financial_transfers
+  filterExpressionType: public_financial_transfers_bool_exp
+  aggregateExpression: public_financial_transfers_agg_exp
+  orderByExpression: public_financial_transfers_order_by_exp
+  graphql:
+    selectMany:
+      queryRootField: public_financial_transfers
+      subscription:
+        rootField: public_financial_transfers
+    selectUniques: []
+    filterInputTypeName: public_financial_transfers_filter_input
+    aggregate:
+      queryRootField: public_financial_transfers_aggregate
+      subscription:
+        rootField: public_financial_transfers_aggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: public_financial_transfers
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+
+---
+kind: Relationship
+version: v1
+definition:
+  name: transfer_sender
+  sourceType: public_financial_transfers
+  description: |
+    Identifies the customer who sent a given transaction.
+    Useful for tracing sender behavior and risk attribution.
+    Relationship: M (public_financial_transfers) → 1 (public_customers)
+  target:
+    model:
+      name: public_customers
+      relationshipType: Object
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: sender_account
+      target:
+        modelField:
+          - fieldName: account
+
+---
+kind: Relationship
+version: v1
+definition:
+  name: transfer_receiver
+  sourceType: public_financial_transfers
+  description: |
+    Identifies the customer who received the transaction.
+    Useful for analyzing receipt-side laundering risks.
+    Relationship: M (public_financial_transfers) → 1 (public_customers)
+  target:
+    model:
+      name: public_customers
+      relationshipType: Object
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: receiver_account
+      target:
+        modelField:
+          - fieldName: account
+
+---
+kind: Relationship
+version: v1
+definition:
+  name: transfer_sar
+  sourceType: public_financial_transfers
+  description: |
+    One transaction can be linked to one SAR.
+    Relationship: 1 (public_financial_transfers) → 1 (public_sars)
+  target:
+    model:
+      name: public_sars
+      relationshipType: Object
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: transaction_id
+      target:
+        modelField:
+          - fieldName: transaction_id
+
+---
+kind: Relationship
+version: v1
+definition:
+  name: financial_transfers_aml_cases
+  sourceType: public_financial_transfers
+  description: Links to AML case data for deep inspection.
+  target:
+    model:
+      name: aml_cases
+      relationshipType: Object
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: transaction_id
+      target:
+        modelField:
+          - fieldName: transaction_id

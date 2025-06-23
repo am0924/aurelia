@@ -1,0 +1,16 @@
+kind: AuthConfig
+version: v4
+definition:
+  mode:
+    jwt:
+      claimsConfig:
+        namespace:
+          claimsFormat: Json
+          location: /claims.jwt.hasura.io
+      tokenLocation:
+        type: BearerAuthorization
+      key:
+        fixed:
+          algorithm: HS256
+          key: 
+            valueFromEnv: AUTH_SECRET

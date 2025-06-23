@@ -1,0 +1,308 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: public_customers
+  description: Contains records of all customers at Aurelia Bank, including personal identifiers, risk classification, political exposure, and blacklist status.
+  fields:
+    - name: account
+      type: int32!
+      description: Account number associated with the customer. Used to link to financial transfers and suspicious activity reports (SARs).
+    - name: address
+      type: string
+      description: Residential or business address.
+    - name: blacklisted
+      type: boolean
+      description: Boolean flag for internal blacklist status or external watchlist inclusion. True if customer is barred from services.
+    - name: customer_id
+      type: int32!
+      description: Unique identifier for the customer.
+    - name: dob
+      type: date
+      description: Customer's date of birth.
+    - name: name
+      type: string!
+      description: Full name of the customer.
+    - name: nationality
+      type: string
+      description: Country of citizenship.
+    - name: pep_status
+      type: boolean
+      description: Boolean flag indicating whether the customer is a Politically Exposed Person (PEP)
+    - name: risk_level
+      type: string
+      description: |
+        AML-assigned risk tier based on internal models. Valid values: 'low', 'medium', 'high'.
+  graphql:
+    typeName: public_customers
+    inputTypeName: public_customers_input
+  dataConnectorTypeMapping:
+    - dataConnectorName: postgres
+      dataConnectorObjectType: public.customers
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: public_customers
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - account
+          - address
+          - blacklisted
+          - customer_id
+          - dob
+          - name
+          - nationality
+          - pep_status
+          - risk_level
+    - role: user
+      output:
+        allowedFields:
+          - account
+          - address
+          - customer_id
+          - dob
+          - name
+          - nationality
+          - risk_level
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: public_customers_bool_exp
+  operand:
+    object:
+      type: public_customers
+      comparableFields:
+        - fieldName: account
+          booleanExpressionType: integer_bool_exp
+        - fieldName: address
+          booleanExpressionType: text_bool_exp
+        - fieldName: blacklisted
+          booleanExpressionType: boolean_bool_exp
+        - fieldName: customer_id
+          booleanExpressionType: integer_bool_exp
+        - fieldName: dob
+          booleanExpressionType: date_bool_exp
+        - fieldName: name
+          booleanExpressionType: character_varying_bool_exp
+        - fieldName: nationality
+          booleanExpressionType: character_varying_bool_exp
+        - fieldName: pep_status
+          booleanExpressionType: boolean_bool_exp
+        - fieldName: risk_level
+          booleanExpressionType: character_varying_bool_exp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: public_customers_bool_exp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: public_customers_agg_exp
+  operand:
+    object:
+      aggregatedType: public_customers
+      aggregatableFields:
+        - fieldName: account
+          aggregateExpression: integer_agg_exp
+        - fieldName: address
+          aggregateExpression: text_agg_exp
+        - fieldName: blacklisted
+          aggregateExpression: boolean_agg_exp
+        - fieldName: customer_id
+          aggregateExpression: integer_agg_exp
+        - fieldName: dob
+          aggregateExpression: date_agg_exp
+        - fieldName: name
+          aggregateExpression: character_varying_agg_exp
+        - fieldName: nationality
+          aggregateExpression: character_varying_agg_exp
+        - fieldName: pep_status
+          aggregateExpression: boolean_agg_exp
+        - fieldName: risk_level
+          aggregateExpression: character_varying_agg_exp
+  count:
+    enable: true
+  graphql:
+    selectTypeName: public_customers_agg_exp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: public_customers_order_by_exp
+  operand:
+    object:
+      orderedType: public_customers
+      orderableFields:
+        - fieldName: account
+          orderByExpression: int32_order_by_exp
+        - fieldName: address
+          orderByExpression: string_order_by_exp
+        - fieldName: blacklisted
+          orderByExpression: boolean_order_by_exp
+        - fieldName: customer_id
+          orderByExpression: int32_order_by_exp
+        - fieldName: dob
+          orderByExpression: date_order_by_exp
+        - fieldName: name
+          orderByExpression: string_order_by_exp
+        - fieldName: nationality
+          orderByExpression: string_order_by_exp
+        - fieldName: pep_status
+          orderByExpression: boolean_order_by_exp
+        - fieldName: risk_level
+          orderByExpression: string_order_by_exp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: public_customers_order_by_exp
+
+---
+kind: Model
+version: v2
+definition:
+  name: public_customers
+  objectType: public_customers
+  source:
+    dataConnectorName: postgres
+    collection: public.customers
+  filterExpressionType: public_customers_bool_exp
+  aggregateExpression: public_customers_agg_exp
+  orderByExpression: public_customers_order_by_exp
+  graphql:
+    selectMany:
+      queryRootField: public_customers
+      subscription:
+        rootField: public_customers
+    selectUniques: []
+    filterInputTypeName: public_customers_filter_input
+    aggregate:
+      queryRootField: public_customers_aggregate
+      subscription:
+        rootField: public_customers_aggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: public_customers
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true
+
+---
+kind: Relationship
+version: v1
+definition:
+  name: customer_sent_transfers
+  sourceType: public_customers
+  description: |
+    Links a customer to all transactions where they are the sender.
+    Used to evaluate outbound financial behavior.
+    Relationship: 1 (public_customers) → M (public_financial_transfers)
+  target:
+    model:
+      name: public_financial_transfers
+      relationshipType: Array
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: account
+      target:
+        modelField:
+          - fieldName: sender_account
+---
+kind: Relationship
+version: v1
+definition:
+  name: customer_received_transfers
+  sourceType: public_customers
+  description: |
+    Links a customer to all transactions where they are the receiver.
+    Used to investigate inbound money flow.
+    Relationship: 1 (public_customers) → M (public_financial_transfers)
+  target:
+    model:
+      name: public_financial_transfers
+      relationshipType: Array
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: account
+      target:
+        modelField:
+          - fieldName: receiver_account
+
+---
+kind: Relationship
+version: v1
+definition:
+  name: customer_sars
+  sourceType: public_customers
+  description: |
+    Links each customer to all Suspicious Activity Reports filed against them.
+    Relationship: 1 (public_customers) → M (public_sars)
+  target:
+    model:
+      name: public_sars
+      relationshipType: Array
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: customer_id
+      target:
+        modelField:
+          - fieldName: customer_id
+
+---
+kind: Relationship
+version: v1
+definition:
+  name: customer_account
+  description: Provides enriched account-level data.
+  sourceType: public_customers
+  target:
+    model:
+      name: accounts
+      relationshipType: Object
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: account
+      target:
+        modelField:
+          - fieldName: account_id
+
+---
+kind: Relationship
+version: v1
+definition:
+  name: customer_match_sanctions
+  sourceType: public_customers
+  description: |
+    Soft-match between customer names and sanctioned entities.
+    Used to screen for false negatives in KYC onboarding.
+    Relationship: M (public_customers) → N (sanctions)
+  target:
+    model:
+      name: sanctions
+      relationshipType: Array
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: name
+      target:
+        modelField:
+          - fieldName: entity_name

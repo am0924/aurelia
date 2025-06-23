@@ -1,0 +1,14 @@
+services:
+  app_mongodb:
+    build:
+      context: .
+      dockerfile: .hasura-connector/Dockerfile.mongodb
+    environment:
+      HASURA_SERVICE_TOKEN_SECRET: $APP_MONGODB_HASURA_SERVICE_TOKEN_SECRET
+      MONGODB_DATABASE_URI: $APP_MONGODB_MONGODB_DATABASE_URI
+      OTEL_EXPORTER_OTLP_ENDPOINT: $APP_MONGODB_OTEL_EXPORTER_OTLP_ENDPOINT
+      OTEL_SERVICE_NAME: $APP_MONGODB_OTEL_SERVICE_NAME
+    extra_hosts:
+      - local.hasura.dev:host-gateway
+    ports:
+      - 9300:8080

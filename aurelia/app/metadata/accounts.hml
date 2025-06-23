@@ -1,0 +1,320 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: accounts_contact_information
+  fields:
+    - name: address
+      type: String
+    - name: email
+      type: String
+    - name: phone_number
+      type: String
+  graphql:
+    typeName: accounts_contact_information
+    inputTypeName: accounts_contact_information_input
+  dataConnectorTypeMapping:
+    - dataConnectorName: mongodb
+      dataConnectorObjectType: accounts_contact_information
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: accounts_contact_information
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - address
+          - email
+          - phone_number
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: accounts_transaction_limits
+  fields:
+    - name: max_num_transactions
+      type: Int
+    - name: max_transaction_limit
+      type: Int
+  graphql:
+    typeName: accounts_transaction_limits
+    inputTypeName: accounts_transaction_limits_input
+  dataConnectorTypeMapping:
+    - dataConnectorName: mongodb
+      dataConnectorObjectType: accounts_transaction_limits
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: accounts_transaction_limits
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - max_num_transactions
+          - max_transaction_limit
+
+---
+kind: ObjectType
+version: v1
+definition:
+  name: accounts
+  description: |
+    Holds account data including risk metrics, contact details, and transaction limits. 
+    An extension of public_customers (public_customers.account -> accounts.account_id).
+  fields:
+    - name: _id
+      type: string!
+    - name: account_id
+      type: Int
+      description: Unique identifier for the account.
+    - name: contact_information
+      type: accounts_contact_information
+      description: Object containing address, phone number, and email contact information.
+    - name: entity_type
+      type: String
+      description: | 
+        Type of entity: 'individual' or 'company'.
+    - name: name
+      type: String
+      description: Name of the individual or company.
+    - name: risk
+      type: String
+      description: |
+        Risk rating assigned to the account. Possible values: 'low', 'medium', 'high'.
+    - name: transaction_limits
+      type: accounts_transaction_limits
+      description: |
+        Object specifying transaction restrictions:
+        - max_num_transactions: Maximum allowed transactions
+        - max_transaction_limit: Maximum allowed transaction amount
+  graphql:
+    typeName: accounts
+    inputTypeName: accounts_input
+  dataConnectorTypeMapping:
+    - dataConnectorName: mongodb
+      dataConnectorObjectType: accounts
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: accounts
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - _id
+          - account_id
+          - contact_information
+          - entity_type
+          - name
+          - risk
+          - transaction_limits
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: accounts_contact_information_bool_exp
+  operand:
+    object:
+      type: accounts_contact_information
+      comparableFields:
+        - fieldName: address
+          booleanExpressionType: String_bool_exp
+        - fieldName: email
+          booleanExpressionType: String_bool_exp
+        - fieldName: phone_number
+          booleanExpressionType: String_bool_exp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: accounts_contact_information_bool_exp
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: accounts_transaction_limits_bool_exp
+  operand:
+    object:
+      type: accounts_transaction_limits
+      comparableFields:
+        - fieldName: max_num_transactions
+          booleanExpressionType: Int_bool_exp
+        - fieldName: max_transaction_limit
+          booleanExpressionType: Int_bool_exp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: accounts_transaction_limits_bool_exp
+
+---
+kind: BooleanExpressionType
+version: v1
+definition:
+  name: accounts_bool_exp
+  operand:
+    object:
+      type: accounts
+      comparableFields:
+        - fieldName: _id
+          booleanExpressionType: ObjectId_bool_exp
+        - fieldName: account_id
+          booleanExpressionType: Int_bool_exp
+        - fieldName: contact_information
+          booleanExpressionType: accounts_contact_information_bool_exp
+        - fieldName: entity_type
+          booleanExpressionType: String_bool_exp
+        - fieldName: name
+          booleanExpressionType: String_bool_exp
+        - fieldName: risk
+          booleanExpressionType: String_bool_exp
+        - fieldName: transaction_limits
+          booleanExpressionType: accounts_transaction_limits_bool_exp
+      comparableRelationships: []
+  logicalOperators:
+    enable: true
+  isNull:
+    enable: true
+  graphql:
+    typeName: accounts_bool_exp
+
+---
+kind: AggregateExpression
+version: v1
+definition:
+  name: accounts_agg_exp
+  operand:
+    object:
+      aggregatedType: accounts
+      aggregatableFields:
+        - fieldName: _id
+          aggregateExpression: ObjectId_agg_exp
+        - fieldName: account_id
+          aggregateExpression: Int_agg_exp
+        - fieldName: entity_type
+          aggregateExpression: String_agg_exp
+        - fieldName: name
+          aggregateExpression: String_agg_exp
+        - fieldName: risk
+          aggregateExpression: String_agg_exp
+  count:
+    enable: true
+  graphql:
+    selectTypeName: accounts_agg_exp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: accounts_contact_information_order_by_exp
+  operand:
+    object:
+      orderedType: accounts_contact_information
+      orderableFields:
+        - fieldName: address
+          orderByExpression: String_order_by_exp
+        - fieldName: email
+          orderByExpression: String_order_by_exp
+        - fieldName: phone_number
+          orderByExpression: String_order_by_exp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: accounts_contact_information_order_by_exp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: accounts_transaction_limits_order_by_exp
+  operand:
+    object:
+      orderedType: accounts_transaction_limits
+      orderableFields:
+        - fieldName: max_num_transactions
+          orderByExpression: Int_order_by_exp
+        - fieldName: max_transaction_limit
+          orderByExpression: Int_order_by_exp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: accounts_transaction_limits_order_by_exp
+
+---
+kind: OrderByExpression
+version: v1
+definition:
+  name: accounts_order_by_exp
+  operand:
+    object:
+      orderedType: accounts
+      orderableFields:
+        - fieldName: _id
+          orderByExpression: string_order_by_exp
+        - fieldName: account_id
+          orderByExpression: Int_order_by_exp
+        - fieldName: contact_information
+          orderByExpression: accounts_contact_information_order_by_exp
+        - fieldName: entity_type
+          orderByExpression: String_order_by_exp
+        - fieldName: name
+          orderByExpression: String_order_by_exp
+        - fieldName: risk
+          orderByExpression: String_order_by_exp
+        - fieldName: transaction_limits
+          orderByExpression: accounts_transaction_limits_order_by_exp
+      orderableRelationships: []
+  graphql:
+    expressionTypeName: accounts_order_by_exp
+
+---
+kind: Model
+version: v2
+definition:
+  name: accounts
+  objectType: accounts
+  source:
+    dataConnectorName: mongodb
+    collection: accounts
+  filterExpressionType: accounts_bool_exp
+  aggregateExpression: accounts_agg_exp
+  orderByExpression: accounts_order_by_exp
+  graphql:
+    selectMany:
+      queryRootField: accounts
+      subscription:
+        rootField: accounts
+    selectUniques:
+      - queryRootField: accounts_by__id
+        uniqueIdentifier:
+          - _id
+        subscription:
+          rootField: accounts_by__id
+    filterInputTypeName: accounts_filter_input
+    aggregate:
+      queryRootField: accounts_aggregate
+      subscription:
+        rootField: accounts_aggregate
+
+---
+kind: ModelPermissions
+version: v1
+definition:
+  modelName: accounts
+  permissions:
+    - role: admin
+      select:
+        filter: null
+        allowSubscriptions: true

@@ -1,0 +1,60 @@
+---
+kind: ObjectType
+version: v1
+definition:
+  name: escalateUnfiledSARs
+  fields:
+    - name: message
+      type: String!
+    - name: success
+      type: Boolean!
+  graphql:
+    typeName: escalateUnfiledSARs
+    inputTypeName: escalateUnfiledSARs_input
+  dataConnectorTypeMapping:
+    - dataConnectorName: utils
+      dataConnectorObjectType: escalateUnfiledSARs
+
+---
+kind: TypePermissions
+version: v1
+definition:
+  typeName: escalateUnfiledSARs
+  permissions:
+    - role: admin
+      output:
+        allowedFields:
+          - message
+          - success
+
+---
+kind: Command
+version: v1
+definition:
+  name: escalateUnfiledSARs
+  description: |
+    • Escalates any Suspicious Activity Reports (SARs) which have a status of 'pending' (public_sars.status) to the associated compliance manager.
+    • This function is to be invoked when a user asks for any Suspicious Activity Reports (SARs) which have a status of 'pending' to be escalated. 
+    • The escalateUnfiledSARs() function takes in a list of Suspicious Activity Report (SAR) ID's (public_sars.sar_id) and escalates each SAR to the associated compliance manager. 
+    • This function returns a object containing success status and message.
+  outputType: escalateUnfiledSARs!
+  arguments:
+    - name: sarIds
+      type: "[Int!]!"
+  source:
+    dataConnectorName: utils
+    dataConnectorCommand:
+      procedure: escalateUnfiledSARs
+  graphql:
+    rootFieldName: escalateUnfiledSARs
+    rootFieldKind: Mutation
+
+---
+kind: CommandPermissions
+version: v1
+definition:
+  commandName: escalateUnfiledSARs
+  permissions:
+    - role: admin
+      allowExecution: true
+
